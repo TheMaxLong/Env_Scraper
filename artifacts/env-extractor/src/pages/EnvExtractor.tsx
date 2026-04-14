@@ -316,20 +316,21 @@ export default function EnvExtractor() {
 
   const formatOutput = (text: string, selected: "AB" | "EF" | "GH", roomId: string) => {
     const lines = text.split("\n").map((line) => line.trim()).filter(Boolean);
+
+    if (roomId) {
+      const single = lines.map((line) => line.match(SINGLE_ROOM_LINE)).find(Boolean);
+      if (single) {
+        const match = single as RegExpMatchArray;
+        return [`${selected} Building`, `- ${roomId.toUpperCase()} — ${match[1]}° // ${match[2]}% // ${match[3]} ppm`].join("\n");
+      }
+    }
+
     const roomLines = lines
       .map((line) => {
         const overview = line.match(ROOM_LINE);
-        if (overview) {
-          const roomNum = overview[2].match(/\d+/)?.[0] ?? "";
-          return `- ${selected}${roomNum} (${overview[2]}) — ${overview[3]}° // ${overview[4]}% // ${overview[5]} ppm`;
-        }
-
-        const single = line.match(SINGLE_ROOM_LINE);
-        if (single && roomId) {
-          return `- ${roomId.toUpperCase()} — ${single[1]}° // ${single[2]}% // ${single[3]} ppm`;
-        }
-
-        return null;
+        if (!overview) return null;
+        const roomNum = overview[2].match(/\d+/)?.[0] ?? "";
+        return `- ${selected}${roomNum} (${overview[2]}) — ${overview[3]}° // ${overview[4]}% // ${overview[5]} ppm`;
       })
       .filter((line): line is string => Boolean(line));
 
