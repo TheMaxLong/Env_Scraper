@@ -97,8 +97,20 @@ router.post("/extract", async (req, res) => {
       .map((b) => (b.type === "text" ? b.text : ""))
       .join("");
 
-    const prefix = req.body.building ? `${req.body.building} Building\n` : "";
-    res.json({ result: `${prefix}${text}` });
+    const selectedBuilding = req.body.building;
+    const cleaned = text
+      .split("\n")
+      .filter((line, index) => {
+        const trimmed = line.trim();
+        if (!trimmed) return true;
+        if (index === 0 && /^(AB|EF|GH)\s+Building$/i.test(trimmed)) return false;
+        return !/^(AB|EF|GH)\s+Building$/i.test(trimmed);
+      })
+      .join("\n")
+      .trim();
+
+    const prefix = selectedBuilding ? `${selectedBuilding} Building\n` : "";
+    res.json({ result: `${prefix}${cleaned}` });
   } catch (err) {
     req.log.error({ err }, "Extraction failed");
     const message = err instanceof Error ? err.message : "Unknown error";
