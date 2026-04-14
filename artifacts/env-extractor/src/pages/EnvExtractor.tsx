@@ -198,6 +198,7 @@ interface ImageFile {
 }
 
 const ROOM_LINE = /^-\s+(EF|AB|GH)\d+\s+\((Flower\s+\d+)\)\s+—\s+(\d+)°\s+\/\/\s+([\d.]+)%\s+\/\/\s+(\d+)\s+ppm$/i;
+const SINGLE_ROOM_LINE = /^-\s+(\d+)°\s+\/\/\s+([\d.]+)%\s+\/\/\s+(\d+)\s+ppm$/i;
 const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 export default function EnvExtractor() {
@@ -313,16 +314,24 @@ export default function EnvExtractor() {
     setTimeout(() => setCopied(false), 1800);
   };
 
-  const formatOutput = (text: string, selected: "AB" | "EF" | "GH") => {
+  const formatOutput = (text: string, selected: "AB" | "EF" | "GH", roomId: string) => {
     const lines = text.split("\n").map((line) => line.trim()).filter(Boolean);
     const roomLines = lines
-      .filter((line) => ROOM_LINE.test(line))
       .map((line) => {
-        const match = line.match(ROOM_LINE);
-        if (!match) return line;
-        const roomNum = match[2].match(/\d+/)?.[0] ?? "";
-        return `- ${selected}${roomNum} (${match[2]}) — ${match[3]}° // ${match[4]}% // ${match[5]} ppm`;
-      });
+        const overview = line.match(ROOM_LINE);
+        if (overview) {
+          const roomNum = overview[2].match(/\d+/)?.[0] ?? "";
+          return `- ${selected}${roomNum} (${overview[2]}) — ${overview[3]}° // ${overview[4]}% // ${overview[5]} ppm`;
+        }
+
+        const single = line.match(SINGLE_ROOM_LINE);
+        if (single && roomId) {
+          return `- ${roomId.toUpperCase()} — ${single[1]}° // ${single[2]}% // ${single[3]} ppm`;
+        }
+
+        return null;
+      })
+      .filter((line): line is string => Boolean(line));
 
     return [`${selected} Building`, ...roomLines].join("\n");
   };
