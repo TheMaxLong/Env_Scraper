@@ -100,11 +100,9 @@ router.post("/extract", async (req, res) => {
     const selectedBuilding = req.body.building;
     const cleaned = text
       .split("\n")
-      .filter((line, index) => {
+      .filter((line) => {
         const trimmed = line.trim();
-        if (!trimmed) return true;
-        if (index === 0 && /^(AB|EF|GH)\s+Building$/i.test(trimmed)) return false;
-        return !/^(AB|EF|GH)\s+Building$/i.test(trimmed);
+        return trimmed && !/^(AB|EF|GH)\s+Building$/i.test(trimmed);
       })
       .join("\n")
       .trim();
