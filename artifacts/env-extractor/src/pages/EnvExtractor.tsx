@@ -76,6 +76,24 @@ const styles = {
     marginBottom: "20px",
     flexWrap: "wrap" as const,
   },
+  buildingRow: {
+    display: "flex",
+    gap: "8px",
+    marginBottom: "14px",
+    flexWrap: "wrap" as const,
+  },
+  buildingBtn: (active: boolean) => ({
+    background: active ? "#7dd3fc" : "transparent",
+    color: active ? "#0a0a0a" : "#7dd3fc",
+    border: `1px solid ${active ? "#7dd3fc" : "#1e293b"}`,
+    borderRadius: "6px",
+    padding: "9px 18px",
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: "12px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    letterSpacing: "0.05em",
+  }),
   btnPrimary: (disabled: boolean) => ({
     background: disabled ? "#1e293b" : "#7dd3fc",
     color: disabled ? "#475569" : "#0a0a0a",
@@ -183,6 +201,7 @@ const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 export default function EnvExtractor() {
   const [images, setImages] = useState<ImageFile[]>([]);
+  const [building, setBuilding] = useState<"AB" | "EF" | "GH" | "">("");
   const [roomOverride, setRoomOverride] = useState("");
   const [dragging, setDragging] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -229,12 +248,19 @@ export default function EnvExtractor() {
     setOutput("");
 
     try {
+      if (!building) {
+        setError("Select AB, EF, or GH first.");
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch(`${BASE_URL}/api/extract`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           images: images.map((img) => ({ base64: img.base64, mediaType: img.mediaType })),
           roomOverride: roomOverride.trim() || undefined,
+          building,
         }),
       });
 
@@ -325,11 +351,23 @@ export default function EnvExtractor() {
         />
       </div>
 
+      <div style={styles.buildingRow}>
+        {(["AB", "EF", "GH"] as const).map((code) => (
+          <button
+            key={code}
+            style={styles.buildingBtn(building === code)}
+            onClick={() => setBuilding(code)}
+          >
+            {code}
+          </button>
+        ))}
+      </div>
+
       <div style={styles.btnRow}>
         <button
           onClick={extract}
-          disabled={loading || !images.length}
-          style={styles.btnPrimary(loading || !images.length)}
+          disabled={loading || !images.length || !building}
+          style={styles.btnPrimary(loading || !images.length || !building)}
         >
           {loading ? (
             <>
@@ -344,6 +382,7 @@ export default function EnvExtractor() {
           style={styles.btnSecondary}
           onClick={() => {
             setImages([]);
+            setBuilding("");
             setOutput("");
             setError("");
             setRoomOverride("");

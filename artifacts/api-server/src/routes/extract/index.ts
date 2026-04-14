@@ -51,6 +51,7 @@ router.post("/extract", async (req, res) => {
     const { images, roomOverride } = req.body as {
       images: Array<{ base64: string; mediaType: string }>;
       roomOverride?: string;
+      building?: "AB" | "EF" | "GH";
     };
 
     if (!images || !Array.isArray(images) || images.length === 0) {
@@ -96,7 +97,8 @@ router.post("/extract", async (req, res) => {
       .map((b) => (b.type === "text" ? b.text : ""))
       .join("");
 
-    res.json({ result: text });
+    const prefix = req.body.building ? `${req.body.building} Building\n` : "";
+    res.json({ result: `${prefix}${text}` });
   } catch (err) {
     req.log.error({ err }, "Extraction failed");
     const message = err instanceof Error ? err.message : "Unknown error";
