@@ -19,7 +19,7 @@ SOURCE TYPE 2 — Zone Overview screen (Infinium/Anderson table):
 Columns: Zone Designation | Channel A | Channel B | Temperature | Humidity | CO2. Map zone names to Room IDs using lookup above. Extract temp, hum, CO2 per row. Skip rows with 0.0° / 0.0% readings. SKIP any row that is not a Flower room (veg, clone, mother, mom, etc).
 
 SOURCE TYPE 3 — Handwritten log sheet:
-Room ID is at top left. Rows are dates. Target the MOST RECENT date row. Extract: Day count, Temp, Hum, CO2. Runoff columns IN/S1/S2/S3 — each has pH (top number) and EC (bottom number) in the same cell. Circled numbers or zeros = N/A.
+Room ID is at top left. Rows are dates. Target the MOST RECENT date row. Extract: Temp, Hum, CO2. Runoff columns IN/S1/S2/S3 — each has pH (top number) and EC (bottom number) in the same cell. Circled numbers or zeros = N/A.
 
 ENVIRONMENTAL OUTPUT FORMAT for Zone Overview (group by building — AB, EF, GH):
 [Building] Building
@@ -31,9 +31,7 @@ Round temp to nearest whole number. CO2 to nearest whole number. Include "ppm" a
 
 ENVIRONMENTAL OUTPUT FORMAT for TrolMaster / Handwritten (group by building):
 [Building] Building
-- [RoomID] (D[XX]) — [Temp]° // [Hum]% // [CO2] ppm
-
-If day count is unavailable from the image, use D?.
+- [RoomID] — [Temp]° // [Hum]% // [CO2] ppm
 
 RUNOFF OUTPUT FORMAT:
 Room | D[XX] | IN: [pH/EC] // S1: [pH/EC] // S2: [pH/EC] // S3: [pH/EC] // Temp: X° // Hum: X% // CO2: XXXX ppm
