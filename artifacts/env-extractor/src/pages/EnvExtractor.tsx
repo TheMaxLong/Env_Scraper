@@ -366,7 +366,7 @@ export default function EnvExtractor() {
             : `${images.length} image${images.length > 1 ? "s" : ""} loaded`}
         </div>
         <div style={{ color: "#334155", fontSize: "11px" }}>
-          TrolMaster · Zone Overview · Handwritten Sheet
+          TrolMaster HCS-1 · Zone Overview · Handwritten Sheet
         </div>
         {images.length > 0 && (
           <div style={styles.fileList}>
@@ -398,7 +398,7 @@ export default function EnvExtractor() {
 
       <div style={{ marginBottom: "14px" }}>
         <span style={styles.roomLabel}>
-          ROOM ID OVERRIDE — for TrolMaster / single-room images only (e.g. EF3, AB1)
+          ROOM ID OVERRIDE — for TrolMaster / single-room images only (e.g. GH1, AB1)
         </span>
         <input
           style={styles.roomInput}

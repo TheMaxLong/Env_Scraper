@@ -13,7 +13,7 @@ AB Flower 1 = AB1, AB Flower 2 = AB2, AB Flower 3 = AB3, AB Flower 4 = AB4, AB F
 GH Flower 1 = GH1, GH Flower 2 = GH2, GH Flower 3 = GH3, GH Flower 4 = GH4, GH Flower 5 = GH5, GH Flower 6 = GH6, GH Flower 7 = GH7, GH Flower 8 = GH8
 
 SOURCE TYPE 1 — TrolMaster HCS-1 screen:
-Single room at a time. Extract: Temp (°F), Humidity (%), CO2 (ppm). Date/time stamp at top. Room ID must be provided by user context.
+Single room at a time. The three large readings are ordered top to bottom as: Temp (°F), Humidity (%), CO2 (ppm). Ignore PPFD and date/time stamps. Room ID must be provided by user context.
 
 SOURCE TYPE 2 — Zone Overview screen (Infinium/Anderson table):
 Columns: Zone Designation | Channel A | Channel B | Temperature | Humidity | CO2. Map zone names to Room IDs using lookup above. Extract temp, hum, CO2 per row. Skip rows with 0.0° / 0.0% readings. SKIP any row that is not a Flower room (veg, clone, mother, mom, etc).
