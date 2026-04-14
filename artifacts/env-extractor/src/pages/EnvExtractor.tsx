@@ -197,8 +197,8 @@ interface ImageFile {
   mediaType: string;
 }
 
-const ROOM_LINE = /^-\s+(EF|AB|GH)\d+\s+\((Flower\s+\d+)\)\s+—\s+(\d+)°\s+\/\/\s+([\d.]+)%\s+\/\/\s+(\d+)\s+ppm$/i;
-const SINGLE_ROOM_LINE = /^-\s+(\d+)°\s+\/\/\s+([\d.]+)%\s+\/\/\s+(\d+)\s+ppm$/i;
+const ROOM_LINE = /^-\s+(EF|AB|GH)\d+\s+\((Flower\s+\d+)\)\s+—\s+[\d.]+°\s+\/\/\s+[\d.]+%\s+\/\/\s+\d+\s+ppm$/i;
+const TROLMASTER_LINE = /^-\s+[A-Z]{2}\d+\s+[—\-]+\s+([\d.]+)°\s+\/\/\s+([\d.]+)%\s+\/\/\s+(\d+)\s+ppm$/i;
 const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 export default function EnvExtractor() {
@@ -225,7 +225,7 @@ export default function EnvExtractor() {
       const image = new Image();
       const url = URL.createObjectURL(file);
       image.onload = () => {
-        const maxWidth = 1400;
+        const maxWidth = 900;
         const scale = Math.min(1, maxWidth / image.width);
         const canvas = document.createElement("canvas");
         canvas.width = Math.round(image.width * scale);
@@ -318,10 +318,10 @@ export default function EnvExtractor() {
     const lines = text.split("\n").map((line) => line.trim()).filter(Boolean);
 
     if (roomId) {
-      const single = lines.map((line) => line.match(SINGLE_ROOM_LINE)).find(Boolean);
-      if (single) {
-        const match = single as RegExpMatchArray;
-        return [`${selected} Building`, `- ${roomId.toUpperCase()} — ${match[1]}° // ${match[2]}% // ${match[3]} ppm`].join("\n");
+      const match = lines.map((l) => l.match(TROLMASTER_LINE)).find(Boolean) as RegExpMatchArray | undefined;
+      if (match) {
+        const temp = Math.round(parseFloat(match[1]));
+        return [`${selected} Building`, `- ${roomId.toUpperCase()} — ${temp}° // ${match[2]}% // ${match[3]} ppm`].join("\n");
       }
     }
 
@@ -329,8 +329,10 @@ export default function EnvExtractor() {
       .map((line) => {
         const overview = line.match(ROOM_LINE);
         if (!overview) return null;
-        const roomNum = overview[2].match(/\d+/)?.[0] ?? "";
-        return `- ${selected}${roomNum} (${overview[2]}) — ${overview[3]}° // ${overview[4]}% // ${overview[5]} ppm`;
+        const parts = line.match(/[\d.]+°\s+\/\/\s+[\d.]+%\s+\/\/\s+\d+\s+ppm/);
+        const values = parts ? parts[0] : "";
+        const roomNum = line.match(/\(Flower\s+(\d+)\)/)?.[1] ?? "";
+        return `- ${selected}${roomNum} (Flower ${roomNum}) — ${values}`;
       })
       .filter((line): line is string => Boolean(line));
 
