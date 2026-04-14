@@ -300,7 +300,7 @@ export default function EnvExtractor() {
 
       const data = (await response.json()) as { result?: string; error?: string };
       if (!response.ok) throw new Error(data.error ?? "Extraction failed");
-      setOutput(data.result ?? "");
+      setOutput(formatOutput(data.result ?? "", building as "AB" | "EF" | "GH"));
     } catch (err) {
       setError("Extraction failed: " + (err instanceof Error ? err.message : String(err)));
     }
@@ -321,7 +321,7 @@ export default function EnvExtractor() {
         const match = line.match(ROOM_LINE);
         if (!match) return line;
         const roomNum = match[2].match(/\d+/)?.[0] ?? "";
-        return `- ${match[1].toUpperCase()}${roomNum} (${match[2]}) — ${match[3]}° // ${match[4]}% // ${match[5]} ppm`;
+        return `- ${selected}${roomNum} (${match[2]}) — ${match[3]}° // ${match[4]}% // ${match[5]} ppm`;
       });
 
     return [`${selected} Building`, ...roomLines].join("\n");
