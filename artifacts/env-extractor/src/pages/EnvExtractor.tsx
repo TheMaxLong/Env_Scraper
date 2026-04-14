@@ -218,12 +218,45 @@ export default function EnvExtractor() {
       r.readAsDataURL(file);
     });
 
+  const toCompressedBase64 = (file: File): Promise<{ base64: string; mediaType: string }> =>
+    new Promise((resolve, reject) => {
+      const image = new Image();
+      const url = URL.createObjectURL(file);
+      image.onload = () => {
+        const maxWidth = 1400;
+        const scale = Math.min(1, maxWidth / image.width);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(image.width * scale);
+        canvas.height = Math.round(image.height * scale);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          URL.revokeObjectURL(url);
+          reject(new Error("Could not process image"));
+          return;
+        }
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        const mediaType = file.type === "image/png" ? "image/jpeg" : file.type || "image/jpeg";
+        const quality = 0.78;
+        const dataUrl = canvas.toDataURL(mediaType, quality);
+        URL.revokeObjectURL(url);
+        resolve({
+          base64: dataUrl.split(",")[1],
+          mediaType,
+        });
+      };
+      image.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("Could not load image"));
+      };
+      image.src = url;
+    });
+
   const processFiles = useCallback(async (files: File[]) => {
     const processed: ImageFile[] = [];
     for (const file of files) {
       if (!file.type.startsWith("image/")) continue;
-      const base64 = await toBase64(file);
-      processed.push({ name: file.name, base64, mediaType: file.type || "image/jpeg" });
+      const { base64, mediaType } = await toCompressedBase64(file);
+      processed.push({ name: file.name, base64, mediaType });
     }
     setImages((prev) => [...prev, ...processed]);
   }, []);
