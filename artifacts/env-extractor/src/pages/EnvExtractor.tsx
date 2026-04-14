@@ -301,7 +301,7 @@ export default function EnvExtractor() {
 
       const data = (await response.json()) as { result?: string; error?: string };
       if (!response.ok) throw new Error(data.error ?? "Extraction failed");
-      setOutput(formatOutput(data.result ?? "", building as "AB" | "EF" | "GH"));
+      setOutput(formatOutput(data.result ?? "", building as "AB" | "EF" | "GH", roomOverride.trim()));
     } catch (err) {
       setError("Extraction failed: " + (err instanceof Error ? err.message : String(err)));
     }
