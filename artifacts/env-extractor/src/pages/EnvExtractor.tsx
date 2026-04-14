@@ -197,6 +197,7 @@ interface ImageFile {
   mediaType: string;
 }
 
+const ROOM_LINE = /^-\s+(EF|AB|GH)\d+\s+\((Flower\s+\d+)\)\s+—\s+(\d+)°\s+\/\/\s+([\d.]+)%\s+\/\/\s+(\d+)\s+ppm$/i;
 const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 export default function EnvExtractor() {
@@ -310,6 +311,20 @@ export default function EnvExtractor() {
     navigator.clipboard.writeText(output);
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
+  };
+
+  const formatOutput = (text: string, selected: "AB" | "EF" | "GH") => {
+    const lines = text.split("\n").map((line) => line.trim()).filter(Boolean);
+    const roomLines = lines
+      .filter((line) => ROOM_LINE.test(line))
+      .map((line) => {
+        const match = line.match(ROOM_LINE);
+        if (!match) return line;
+        const roomNum = match[2].match(/\d+/)?.[0] ?? "";
+        return `- ${match[1].toUpperCase()}${roomNum} (${match[2]}) — ${match[3]}° // ${match[4]}% // ${match[5]} ppm`;
+      });
+
+    return [`${selected} Building`, ...roomLines].join("\n");
   };
 
   return (
