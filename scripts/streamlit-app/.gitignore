@@ -1,0 +1,27 @@
+# Local-only files. Never commit these.
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+
+# Virtual env (created by run.command / run.bat)
+.venv/
+venv/
+
+# Buyer-specific config (the example IS committed, this one is not)
+config/facility.yaml
+
+# Local extraction history
+history.db
+history.db-journal
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor cruft
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,64 @@
+# Facility configuration for Runoff Reader.
+# Edit this file (or use the Configure tab in the app) to match your grow.
+# These are GENERIC placeholders — replace with your actual facility codes.
+
+facility:
+  name: "Your Grow"
+
+  # Buildings are top-level groupings of rooms (e.g. by physical structure).
+  # Replace codes and room numbers with what your facility uses.
+  buildings:
+    - code: A
+      label: "Building A"
+      rooms: [1, 2, 3, 4]
+      # The zone name as printed on your controller screen (if applicable).
+      room_label_template: "Flower {n}"
+    - code: B
+      label: "Building B"
+      rooms: [1, 2, 3, 4]
+      room_label_template: "Flower {n}"
+
+  units:
+    temperature: F   # F or C
+    co2: ppm
+
+  # Set to true ONLY if your facility logs BOTH a regular EC (X.X format)
+  # and a Solus EC reading (X.XX format) per station. Most facilities log
+  # only one EC value per station — leave this false unless you have a
+  # Solus sensor and explicitly track its readings.
+  solus_ec_enabled: false
+
+  # Which source types this facility uses.
+  log_sources:
+    - handwritten_runoff     # Paper sheets with runoff readings (primary)
+    - trolmaster_hcs1        # Single-room controller screen (optional)
+    - anderson_zone_table    # Multi-row zone overview table (optional)
+
+  # Skip these zone names entirely. Anything labeled veg/clone/mom is filtered.
+  exclude_keywords:
+    - veg
+    - vegetation
+    - clone
+    - clones
+    - mother
+    - mom
+
+  # Thresholds drive the flagging logic + spreadsheet conditional formatting.
+  # Adjust to match your SOP. Defaults below are common cultivation ranges.
+  thresholds:
+    ph:
+      high: 6.3        # pH >= 6.3 -> HIGH flag
+      low: 5.6         # pH <= 5.6 -> LOW flag
+      borderline_high: 6.1
+      borderline_low: 5.8
+    ec:
+      high: 5.5        # informational ceiling
+      low: 1.5         # informational floor
+      borderline_high: 3.5
+      borderline_low: 2.8
+    # Combo flags fire when both conditions hit at once.
+    combo_flag:
+      ph_high: 6.1     # if pH >= this AND
+      ec_high: 3.5     # EC >= this -> both flagged
+      ph_low: 5.6      # if pH <= this AND
+      ec_low: 2.8      # EC <= this -> both flagged
